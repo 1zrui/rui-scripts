@@ -12,7 +12,8 @@
 ## 路径
 
 ```
-D:\cc_workspace\rui-scripts\          # 仓库根目录
+D:\git_scripts\                      # 主仓库（OpenClaw 和大哥使用）
+D:\cc_workspace\rui-scripts\          # Claude Code 仓库（泡泡使用）
 D:\cc_workspace\rui-scripts\.git\     # Git 仓库
 
 # 泡泡的记忆（每次启动自动读取）
@@ -20,7 +21,7 @@ C:\Users\Administrator\.claude\projects\D--cc-workspace\memory\MEMORY.md
 C:\Users\Administrator\.claude\projects\D--cc-workspace\memory\*.md
 
 # 泡泡的项目指令（每次启动自动读取）
-D:\cc_workspace\CLAUDE.md
+D:\cc_workspace\rui-scripts\CLAUDE.md
 ```
 
 ## 协作流程
@@ -87,7 +88,7 @@ claude "检查 rui-scripts 仓库有没有新的 todo Issue，有的话逐个实
 1. 读取 CLAUDE.md（知道自己是泡泡）
 2. 读取 memory/ 目录（看到 current-task.md）
 3. 读取 Issue 内容（`gh issue view #3 --repo 1zrui/rui-scripts`）
-4. 在 `D:\cc_workspace\rui-scripts\` 目录下写代码
+4. 在 `D:\cc_workspace\rui-scripts\` 目录下写代码（泡泡的仓库）
 5. 提交并推送（`git commit` + `git push`）
 6. 如果任务完成，可以关闭 Issue（`gh issue close #3 --repo 1zrui/rui-scripts`）
 
@@ -130,7 +131,7 @@ OpenClaw: 创建 Issue → 写 current-task.md → 启动泡泡
 ## 注意事项
 
 1. **记忆目录路径固定**：`C:\Users\Administrator\.claude\projects\D--cc-workspace\memory\`，不要改
-2. **CLAUDE.md 路径固定**：`D:\cc_workspace\CLAUDE.md`，不要改
+2. **CLAUDE.md 路径固定**：`D:\cc_workspace\rui-scripts\CLAUDE.md`，不要改
 3. **仓库路径固定**：`D:\cc_workspace\rui-scripts\`，不要改
 4. **泡泡不会主动运行**：必须有人或 OpenClaw 执行 `claude` 命令才会启动
 5. **会话是独立的**：但记忆是持久的，每次启动都会读，所以通过文件传递信息没有问题
