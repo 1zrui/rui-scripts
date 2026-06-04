@@ -1,30 +1,47 @@
 # rui-scripts
 
-个人脚本和工具集，由 **OpenClaw** 和 **Claude Code (泡泡)** 协作开发。
-
-## 项目说明
-
-本仓库包含日常工作中的 SQL 查询脚本、自动化工具和学习笔记。
+个人脚本和工具集
 
 ## 目录结构
 
 ```
-├── SQL/              # ZLHIS SQL 脚本和学习笔记
-├── scripts/          # Python/自动化脚本
-├── docs/             # 文档
-├── CLAUDE.md         # AI 协作说明（给 Claude 看的）
-├── LICENSE           # MIT License
-└── .gitignore
+rui-scripts/
+├── SQL/              # ZLHIS SQL脚本和学习笔记
+├── scripts/          # Python脚本和自动化工具
+├── docs/             # 文档和说明
+├── CLAUDE.md         # 项目说明（给Claude Code看）
+└── README.md         # 本文件
 ```
 
-## 协作者
+## 内容
 
-- **大哥 (1zrui)** — 项目所有者
-- **OpenClaw** — 项目管理、任务调度
-- **泡泡 (Claude Code)** — 代码实现、技术方案
+### SQL/
+- ZLHIS数据字典学习笔记
+- 门诊/住院报表脚本
+- 患者查询脚本
 
-## 协作规范
+### scripts/
+- 视频处理脚本
+- 报表生成脚本
+- 数据查询工具
+- 其他自动化脚本
 
-- 脚本文件放在对应目录（SQL/ 放查询，scripts/ 放自动化）
-- 重要改动先跟大哥确认再提交
-- commit message 用中文，简洁明了
+## 协作方式
+
+- **布丁（OpenClaw）**：项目规划、需求分析、代码审查
+- **Claude Code**：主要开发、代码实现
+
+## 使用方法
+
+```bash
+# 克隆仓库
+git clone https://github.com/1zrui/rui-scripts.git
+
+# 更新代码
+git pull
+
+# 添加文件
+git add .
+git commit -m "说明"
+git push
+```
