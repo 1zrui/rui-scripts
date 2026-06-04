@@ -1,0 +1,652 @@
+select * from (
+ select 1 序号, row_number() over(order by 项目) 子序号, 科室, 项目, 数据
+   from (
+ select n.名称 科室, m.项目, m.数据
+   from (select 出院科室id, '总收治病种数' 项目, sum(数据) 数据
+           from (select 病人id, 主页id, count(*) 数据
+                   from 病人诊断记录
+                  where 记录来源 = 3
+                    and 诊断类型 = 11
+                  group by 病人id, 主页id) a,
+                病案主页 b
+          where a.病人id = b.病人id
+            and a.主页id = b.主页id
+            and 出院日期 between [0] and [1]
+          group by 出院科室id
+         union all
+         select w.出院科室id,
+                '急危重病比例' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in
+                                        ('中医危重', '中医急症')
+                                    and 信息值 = '1'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '疑难病比例' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in ('中医疑难')
+                                    and 信息值 = '1'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '中医疾病诊断准确率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 诊断符合情况
+                          where 符合类型 = 11
+                            and 符合情况 = 1
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人Id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         Union all
+         select w.出院科室id,
+                '入出院诊断符合率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 诊断符合情况
+                          where 符合类型 = 12
+                            and 符合情况 = 1
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人Id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '辩证论证符合率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 诊断符合情况
+                          where 符合类型 = 13
+                            and 符合情况 in (1, 2)
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '入院三日确诊率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病案主页
+                          where 是否确诊 = 1
+                            and trunc(确诊日期) - trunc(入院日期) < 3
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '急危重疑难病中医治疗参与率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, count(*) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in
+                                        ('中医危重', '中医急症', '中医疑难')
+                                    and 信息值 = '1'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) a,
+                        (select 病人id, 主页id, count(*)
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in
+                                        ('中医设备', '中医技术', '自制中药制剂')
+                                    and 信息值 = '是'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) b,
+                        病案主页 c
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and a.病人id = c.病人id
+                    and a.主页id = c.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病案主页从表
+                          where 信息名 in ('中医危重', '中医急症', '中医疑难')
+                            and 信息值 = '1'
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '单病种中医治疗率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, count(*) 数据
+                   from (select a.病人id, a.主页id, count(*) 数据
+                           from 病案主页从表 a, 病人诊断记录 b
+                          where a.病人id = b.病人id
+                            and a.主页id = b.主页id
+                            and 信息名 in
+                                ('中医设备', '中医技术', '自制中药制剂')
+                            and 信息值 = '是'
+                            and 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 like '%锁骨骨折%' or
+                                诊断描述 like '%肱骨外科颈骨折%' or
+                                诊断描述 like '%肱骨髁上骨折%' or
+                                诊断描述 like '%孟氏骨折%' or
+                                诊断描述 like '%桡骨远端骨折%' or
+                                诊断描述 like '%胫腓骨骨折%' or
+                                诊断描述 like '%跟骨骨折%')
+                          group by a.病人id, a.主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病人诊断记录
+                          where 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 like '%锁骨骨折%' or
+                                诊断描述 like '%肱骨外科颈骨折%' or
+                                诊断描述 like '%肱骨髁上骨折%' or
+                                诊断描述 like '%孟氏骨折%' or
+                                诊断描述 like '%桡骨远端骨折%' or
+                                诊断描述 like '%胫腓骨骨折%' or
+                                诊断描述 like '%跟骨骨折%')
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '其他病种中医治疗率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, count(*) 数据
+                   from (select a.病人id, a.主页id, count(*) 数据
+                           from 病案主页从表 a, 病人诊断记录 b
+                          where a.病人id = b.病人id
+                            and a.主页id = b.主页id
+                            and 信息名 in
+                                ('中医设备', '中医技术', '自制中药制剂')
+                            and 信息值 = '是'
+                            and 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 not like '%锁骨骨折%' or
+                                诊断描述 not like '%肱骨外科颈骨折%' or
+                                诊断描述 not like '%肱骨髁上骨折%' or
+                                诊断描述 not like '%孟氏骨折%' or
+                                诊断描述 not like '%桡骨远端骨折%' or
+                                诊断描述 not like '%胫腓骨骨折%' or
+                                诊断描述 not like '%跟骨骨折%')
+                          group by a.病人id, a.主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病人诊断记录
+                          where 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 not like '%锁骨骨折%' or
+                                诊断描述 not like '%肱骨外科颈骨折%' or
+                                诊断描述 not like '%肱骨髁上骨折%' or
+                                诊断描述 not like '%孟氏骨折%' or
+                                诊断描述 not like '%桡骨远端骨折%' or
+                                诊断描述 not like '%胫腓骨骨折%' or
+                                诊断描述 not like '%跟骨骨折%')
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '病房中医治疗率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, count(*) 数据
+                   from (select a.病人id, a.主页id, count(*) 数据
+                           from 病案主页从表 a, 病人诊断记录 b
+                          where a.病人id = b.病人id
+                            and a.主页id = b.主页id
+                            and 信息名 in
+                                ('中医设备', '中医技术', '自制中药制剂')
+                            and 信息值 = '是'
+                            and 记录来源 = 3
+                            and 诊断类型 = 11
+                          group by a.病人id, a.主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) w,
+                (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病人诊断记录
+                          where 记录来源 = 3
+                            and 诊断类型 = 11
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select w.出院科室id,
+                '辩证使用中成药率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, count(*) 数据
+                   from (select distinct 出院科室id, a.病人id, a.主页id
+                           from 诊断符合情况 a, 住院费用记录 b, 病案主页 c
+                          where a.病人Id = b.病人id
+                            and a.主页id = b.主页Id
+                            and a.病人id = c.病人id
+                            and a.主页id = c.主页id
+                            and 符合类型 = 13
+                            and 符合情况 <> 0
+                            and b.收费类别 = '6'
+                            and 出院日期 between [0] and [1]
+                         )
+                  group by 出院科室id) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+         union all
+         select 出院科室id,
+                '危重病人抢救成功率' 项目,
+                round(成功次数 / decode(抢救次数, 0, 1, 抢救次数) * 100, 2) 数据
+           from (select 出院科室id,
+                        sum(nvl(成功次数, 0)) 成功次数,
+                        sum(nvl(抢救次数, 0)) 抢救次数
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id)
+         union all
+         select w.出院科室id,
+                '出院患者非手术比率' 项目,
+                (case when y.数据 = 0 then 0 else round((y.数据 - w.数据 ) / y.数据 * 100, 2) end) 数据
+           from (select count(distinct a.病人id) 数据, b.出院科室id 出院科室id
+                   from 病人手麻记录 a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and b.出院日期 between [0] and [1]
+                  group by b.出院科室id) w,
+                (select count(*) 数据, 出院科室id
+                   from 病案主页
+                  where 出院日期 between [0] and [1]
+                  group by 出院科室id) y
+          where w.出院科室id = y.出院科室id
+ ) m, 部门表 n
+ where m.出院科室id = n.id
+
+ UNION ALL
+
+ select 2 序号, row_number() over(order by 项目) 子序号, 科室, 项目, 数据
+   from (
+ select '总合计' 科室, 项目, 数据
+   from (select '总收治病种数' 项目, count(max(数据)) as 数据
+           from (select 病人id, 主页id as 主页id, 诊断描述 as 数据
+                   from 病人诊断记录
+                  where 记录来源 = 3
+                    and 诊断类型 = 11
+                  group by 病人id, 主页id, 诊断描述) a,
+                病案主页 b
+          where a.病人id = b.病人id
+            and a.主页id = b.主页id
+            and 出院日期 between [0] and [1]
+          group by 数据
+         union all
+         select '急危重病比例' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in
+                                        ('中医危重', '中医急症')
+                                    and 信息值 = '1'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '疑难病比例' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select 出院科室id, sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in ('中医疑难')
+                                    and 信息值 = '1'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '中医疾病诊断准确率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 诊断符合情况
+                          where 符合类型 = 11
+                            and 符合情况 = 1
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人Id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '入出院诊断符合率' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 诊断符合情况
+                          where 符合类型 = 12
+                            and 符合情况 = 1
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人Id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '辩证论证符合率' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 诊断符合情况
+                          where 符合类型 = 13
+                            and 符合情况 in (1, 2)
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select 出院科室id, count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '入院三日确诊率' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病案主页
+                          where 是否确诊 = 1
+                            and trunc(确诊日期) - trunc(入院日期) < 3
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '急危重疑难病中医治疗参与率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select count(*) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in
+                                        ('中医危重', '中医急症', '中医疑难')
+                                    and 信息值 = '1'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) a,
+                        (select 病人id, 主页id, count(*)
+                           from (select 病人id, 主页id, count(*) 数据
+                                   from 病案主页从表
+                                  where 信息名 in
+                                        ('中医设备', '中医技术', '自制中药制剂')
+                                    and 信息值 = '是'
+                                  group by 病人id, 主页id)
+                          group by 病人id, 主页id) b,
+                        病案主页 c
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and a.病人id = c.病人id
+                    and a.主页id = c.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病案主页从表
+                          where 信息名 in ('中医危重', '中医急症', '中医疑难')
+                            and 信息值 = '1'
+                          group by 病人id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) y
+         union all
+         select '单病种中医治疗率' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select count(*) 数据
+                   from (select a.病人id, a.主页id, count(*) 数据
+                           from 病案主页从表 a, 病人诊断记录 b
+                          where a.病人id = b.病人id
+                            and a.主页id = b.主页id
+                            and 信息名 in
+                                ('中医设备', '中医技术', '自制中药制剂')
+                            and 信息值 = '是'
+                            and 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 like '%锁骨骨折%' or
+                                诊断描述 like '%肱骨外科颈骨折%' or
+                                诊断描述 like '%肱骨髁上骨折%' or
+                                诊断描述 like '%孟氏骨折%' or
+                                诊断描述 like '%桡骨远端骨折%' or
+                                诊断描述 like '%胫腓骨骨折%' or
+                                诊断描述 like '%跟骨骨折%')
+                          group by a.病人id, a.主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病人诊断记录
+                          where 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 like '%锁骨骨折%' or
+                                诊断描述 like '%肱骨外科颈骨折%' or
+                                诊断描述 like '%肱骨髁上骨折%' or
+                                诊断描述 like '%孟氏骨折%' or
+                                诊断描述 like '%桡骨远端骨折%' or
+                                诊断描述 like '%胫腓骨骨折%' or
+                                诊断描述 like '%跟骨骨折%')
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) y
+         union all
+         select '其他病种中医治疗率' 项目,
+                round(w.数据 / y.数据 * 100, 2) 数据
+           from (select count(*) 数据
+                   from (select a.病人id, a.主页id, count(*) 数据
+                           from 病案主页从表 a, 病人诊断记录 b
+                          where a.病人id = b.病人id
+                            and a.主页id = b.主页id
+                            and 信息名 in
+                                ('中医设备', '中医技术', '自制中药制剂')
+                            and 信息值 = '是'
+                            and 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 not like '%锁骨骨折%' or
+                                诊断描述 not like '%肱骨外科颈骨折%' or
+                                诊断描述 not like '%肱骨髁上骨折%' or
+                                诊断描述 not like '%孟氏骨折%' or
+                                诊断描述 not like '%桡骨远端骨折%' or
+                                诊断描述 not like '%胫腓骨骨折%' or
+                                诊断描述 not like '%跟骨骨折%')
+                          group by a.病人id, a.主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病人诊断记录
+                          where 记录来源 = 3
+                            and 诊断类型 = 11
+                            and (诊断描述 not like '%锁骨骨折%' or
+                                诊断描述 not like '%肱骨外科颈骨折%' or
+                                诊断描述 not like '%肱骨髁上骨折%' or
+                                诊断描述 not like '%孟氏骨折%' or
+                                诊断描述 not like '%桡骨远端骨折%' or
+                                诊断描述 not like '%胫腓骨骨折%' or
+                                诊断描述 not like '%跟骨骨折%')
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) y
+         union all
+         select '病房中医治疗率' 项目, round(w.数据 / y.数据 * 100, 2) 数据
+           from (select count(*) 数据
+                   from (select a.病人id, a.主页id, count(*) 数据
+                           from 病案主页从表 a, 病人诊断记录 b
+                          where a.病人id = b.病人id
+                            and a.主页id = b.主页id
+                            and 信息名 in
+                                ('中医设备', '中医技术', '自制中药制剂')
+                            and 信息值 = '是'
+                            and 记录来源 = 3
+                            and 诊断类型 = 11
+                          group by a.病人id, a.主页id) a,
+                        病案主页 b
+                  where a.病人Id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) w,
+                (select sum(数据) 数据
+                   from (select 病人id, 主页id, count(*) 数据
+                           from 病人诊断记录
+                          where 记录来源 = 3
+                            and 诊断类型 = 11
+                          group by 病人Id, 主页id) a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and 出院日期 between [0] and [1]) y
+         union all
+         select '辩证使用中成药率' 项目,
+                round(decode(y.数据, 0, 0, w.数据 / y.数据) * 100, 2) 数据
+           from (select count(*) 数据
+                   from (select a.病人id, a.主页id
+                           from 诊断符合情况 a, 住院费用记录 b, 病案主页 c
+                          where a.病人Id = b.病人id
+                            and a.主页id = b.主页Id
+                            and a.病人id = c.病人id
+                            and a.主页id = c.主页id
+                            and 符合类型 = 13
+                            and 符合情况 <> 0
+                            and b.收费类别 = '6'
+                            and 出院日期 between [0] and [1]
+                          group by a.病人id, a.主页id)) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+         union all
+         select '危重病人抢救成功率' 项目,
+                round(decode(抢救次数, 0, 0, 成功次数 / 抢救次数) * 100, 2) 数据
+           from (select sum(nvl(成功次数, 0)) 成功次数,
+                        sum(nvl(抢救次数, 0)) 抢救次数
+                   from 病案主页
+                  where 出院日期 between [0] and [1])
+         union all
+         select '出院患者非手术比率' 项目,
+                (case when y.数据 = 0 then 0 else round((y.数据 - w.数据 ) / y.数据 * 100, 2) end) 数据
+           from (select count(distinct a.病人id) 数据
+                   from 病人手麻记录 a,
+                        病案主页 b
+                  where a.病人id = b.病人id
+                    and a.主页id = b.主页id
+                    and b.出院日期 between [0] and [1]) w,
+                (select count(*) 数据
+                   from 病案主页
+                  where 出院日期 between [0] and [1]) y
+ )
+) order by 序号, 子序号 asc, 数据 desc

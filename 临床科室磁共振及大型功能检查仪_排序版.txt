@@ -1,0 +1,96 @@
+select * from (
+ select 1 序号, row_number() over(order by 名称) 子序号, 科室, 名称, 次数
+   from (select 科室,
+                DECODE(名称, 'CT费', 'CT', 'DR费', 'DR', 名称) 名称,
+                sum(次数) 次数
+           from (select c.名称 科室, b.名称, sum(数次) 次数
+                   from 门诊费用记录 a,
+                        部门表 c,
+                        (select a.id, decode(b.id, 45, '磁共振', b.名称) 名称
+                           from 收费项目目录 a, 收费分类目录 b
+                          where a.分类id = b.id
+                            and a.分类id IN (51, 47, 49, 54, 42, 45)
+                            and a.id <> 51767
+                         union all
+                         select id,
+                                decode(id, 2646, '关节镜', 51767, '0.5磁共振', 名称) 名称
+                           from 收费项目目录
+                          where id in
+                                (2239, 2969, 2245, 2981, 2248, 2249, 2646,3231,51767,56044)) b
+                  where a.收费细目id = b.id
+                    and a.病人科室id = c.id
+                    and 记录状态 <> 0
+                    and 登记时间 between [0] and [1]
+                  group by c.名称, b.名称
+                  
+                  union all
+                  
+                  select c.名称 科室, b.名称, count(distinct a.病人ID||to_char(a.登记时间,'yyyymmdd')) 次数
+                   from 门诊费用记录 a,
+                        部门表 c,
+                        (select a.id, b.名称 名称
+                           from 收费项目目录 a, 收费分类目录 b
+                          where a.分类id = b.id
+                            and a.分类id in (46,52)
+                            and a.id <> 51767
+                         ) b
+                  where a.收费细目id = b.id
+                    and a.病人科室id = c.id
+                    and 记录状态 <> 0
+                    and 登记时间 between [0] and [1]
+                  group by c.名称, b.名称
+                 
+                 union all
+
+                 select c.名称 科室, b.名称, count(*) 次数
+                   from 住院费用记录 a,
+                        部门表 c,
+                        (select a.id, decode(b.id, 45, '磁共振', b.名称) 名称
+                           from 收费项目目录 a, 收费分类目录 b
+                          where a.分类id = b.id
+                            and a.分类id IN (51, 47, 49, 54, 42, 45)
+                            and a.id <> 51767
+                         union all
+                         select id,
+                                decode(id, 2646, '关节镜', 51767, '0.5磁共振',3231, '椎间盘镜',62946, '椎间盘镜', 名称) 名称
+                           from 收费项目目录
+                          where id in
+                                (2239, 2969, 2245, 2981, 2248, 2249, 2646,3231, 51767,56044,62946)) b
+                  where a.收费细目id = b.id
+                    and a.病人科室id = c.id
+                    and 记录状态 <> 0
+                    and 实收金额 is not null
+                    and 登记时间 between [0] and [1]
+                  group by c.名称, b.名称
+                  
+                  union all
+
+                 select c.名称 科室, b.名称, count(distinct a.病人ID||to_char(a.登记时间,'yyyymmdd')) 次数
+                   from 住院费用记录 a,
+                        部门表 c,
+                        (select a.id,  b.名称 名称
+                           from 收费项目目录 a, 收费分类目录 b
+                          where a.分类id = b.id
+                            and a.分类id in (46,52)
+                            and a.id <> 51767
+                         ) b
+                  where a.收费细目id = b.id
+                    and a.病人科室id = c.id
+                    and 记录状态 <> 0
+                    and 实收金额 is not null
+                    and 登记时间 between [0] and [1]
+                  group by c.名称, b.名称
+                  
+                 union all
+                 select c.名称 科室, '床旁透视' 名称, sum(数次) 次数
+                   from 收费项目目录 a, 住院费用记录 b, 部门表 c
+                  where a.id = b.收费细目id
+                    and b.病人科室id = c.id
+                    and 收费细目id in (1529)
+                    and 记录状态 = 1
+                    and 实收金额 is not null
+                    and 登记时间 between [0] and [1]
+                  group by c.名称)
+          group by 科室, 名称
+         having sum(次数) <> 0)
+) order by 序号, 子序号 asc, 次数 desc
