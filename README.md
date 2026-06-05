@@ -6,30 +6,35 @@
 
 ```
 rui-scripts/
-├── SQL/              # ZLHIS SQL脚本和学习笔记
-├── scripts/          # Python脚本和自动化工具
-├── docs/             # 文档和说明
-├── CLAUDE.md         # 项目说明（给Claude Code看）
-└── README.md         # 本文件
+├── SQL/                    # ZLHIS SQL 脚本和学习笔记
+│   ├── 学习笔记/           # SQL 学习笔记（通用 + ZLHIS）
+│   ├── 查询脚本/           # 各类查询 SQL（会诊、骨密度、中药颗粒等）
+│   └── 报表脚本/           # 门诊/住院报表 SQL
+├── scripts/                # Python 脚本和自动化工具
+│   ├── binance_query.py    # 币安行情查询工具
+│   └── dict_query.py       # ZLHIS 数据字典查询工具
+├── docs/                   # 文档和说明
+│   ├── openclaude-bubble-workflow.md  # OpenClaw × 泡泡协作流程
+│   └── requirements/       # 需求文档
+├── CLAUDE.md               # Claude Code 项目配置
+└── README.md               # 本文件
 ```
 
-## 内容
+## 内容说明
 
 ### SQL/
-- ZLHIS数据字典学习笔记
-- 门诊/住院报表脚本
-- 患者查询脚本
+- **学习笔记/**：SQL 基础、ZLHIS 表结构、查询技巧
+- **查询脚本/**：会诊查询、骨密度患者查询、中药颗粒查询等
+- **报表脚本/**：门诊中医工作报表、治疗报表、检查设备排序等
 
 ### scripts/
-- 视频处理脚本
-- 报表生成脚本
-- 数据查询工具
-- 其他自动化脚本
+- 币安行情查询（支持多币种、代理、JSON 输出）
+- ZLHIS 数据字典查询（按表名/字段名模糊搜索）
 
 ## 协作方式
 
 - **布丁（OpenClaw）**：项目规划、需求分析、代码审查
-- **Claude Code**：主要开发、代码实现
+- **Claude Code（泡泡）**：主要开发、代码实现
 
 ## 使用方法
 
