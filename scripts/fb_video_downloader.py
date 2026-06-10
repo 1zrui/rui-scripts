@@ -29,7 +29,7 @@ PAGE_URL = "https://www.facebook.com/share/18og5yecYJ/?mibextid=wwXIfr"
 
 # 下载配置
 OUTPUT_DIR = Path("D:/布丁工作区/facebook_download/")
-DOWNLOADED_LOG = Path(__file__).parent / "fb_downloaded.json"
+DOWNLOADED_LOG = Path(__file__).resolve().parent / "fb_downloaded.json"
 MAX_DURATION = 60  # 秒
 
 # Cookie（需要手动填入Facebook登录后的cookie）

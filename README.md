@@ -12,11 +12,13 @@ rui-scripts/
 │   └── 报表脚本/           # 门诊/住院报表 SQL
 ├── scripts/                # Python 脚本和自动化工具
 │   ├── binance_query.py    # 币安行情查询工具
-│   └── dict_query.py       # ZLHIS 数据字典查询工具
+│   ├── dict_query.py       # ZLHIS 数据字典查询工具
+│   ├── github_trending.py  # GitHub Trending 热门项目日报工具
+│   ├── fb_video_downloader.py  # Facebook 博主视频自动下载工具
+│   └── zlhis_kb.py         # ZLHIS SQL 知识库（ChromaDB + 智能问答）
 ├── docs/                   # 文档和说明
-│   ├── openclaude-bubble-workflow.md  # OpenClaw × 泡泡协作流程
 │   └── requirements/       # 需求文档
-├── CLAUDE.md               # Claude Code 项目配置
+├── AGENTS.md               # Hermes（豆子）工作区配置
 └── README.md               # 本文件
 ```
 
@@ -28,13 +30,20 @@ rui-scripts/
 - **报表脚本/**：门诊中医工作报表、治疗报表、检查设备排序等
 
 ### scripts/
-- 币安行情查询（支持多币种、代理、JSON 输出）
-- ZLHIS 数据字典查询（按表名/字段名模糊搜索）
+- **binance_query.py** — 币安行情查询（支持多币种、代理、JSON 输出）
+- **dict_query.py** — ZLHIS 数据字典查询（按表名/字段名模糊搜索）
+- **github_trending.py** — GitHub Trending 热门项目抓取（支持语言/时间筛选）
+- **fb_video_downloader.py** — Facebook 博主短视频自动下载（yt-dlp）
+- **zlhis_kb.py** — ZLHIS SQL 知识库（ChromaDB 嵌入 + 智能问答）
+
+### docs/
+- **requirements/**：各脚本的需求文档
 
 ## 协作方式
 
-- **布丁（OpenClaw）**：项目规划、需求分析、代码审查
-- **Claude Code（泡泡）**：主要开发、代码实现
+- **Hermes（豆子🍡）**：日常开发、脚本维护、仓库整理
+- **OpenClaw（布丁）**：需求分析、代码审查、方案讨论
+- **Claude Code（泡泡）**：辅助开发（按需调用）
 
 ## 使用方法
 

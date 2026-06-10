@@ -42,3 +42,12 @@ Desktop.ini
 .env
 *.key
 *.pem
+
+# ChromaDB (知识库向量数据库，运行生成)
+.zlhis_chromadb/
+
+# 下载的文件
+fb_downloaded.json
+
+# Hermes 工作区
+.hermes/

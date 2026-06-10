@@ -15,8 +15,8 @@ from pathlib import Path
 from dataclasses import dataclass, field
 
 # ── 配置 ──────────────────────────────────────────────────────────────────────
-NOTES_DIR = Path(r"D:\git_scripts\SQL\学习笔记")
-DB_DIR = Path(r"D:\cc_workspace\rui-scripts\scripts\.zlhis_chromadb")
+NOTES_DIR = Path(__file__).resolve().parent.parent / "SQL" / "学习笔记"
+DB_DIR = Path(__file__).resolve().parent / ".zlhis_chromadb"
 COLLECTION_NAME = "zlhis_sql"
 EMBED_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"  # 多语言，体积小，效果好
 
